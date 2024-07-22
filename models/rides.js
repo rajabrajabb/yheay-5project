@@ -25,7 +25,7 @@ const rideSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
-  travelLineId: [
+  travelLine: [
     {
       type: mongoose.Schema.ObjectId,
       ref: "TravelLine",
@@ -34,6 +34,16 @@ const rideSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  rideState: {
+    type: String,
+    enum: ["ongoing", "arrived"],
+    default: "ongoing",
+  },
+  driverState: {
+    type: String,
+    enum: ["waiting", "accepted", "rejected"],
+    default: "waiting",
   },
 });
 // rideSchema.pre("remove", function (next) {

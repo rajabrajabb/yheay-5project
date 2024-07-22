@@ -12,6 +12,8 @@ exports.addRide = catchAsync(async (req, res, next) => {
       depatureTime: req.body.depatureTime,
       arrivingTime: req.body.arrivingTime,
 
+      travelLine: req.body.travelLine,
+
       availableSeats: req.body.seats,
       seats: req.body.seats,
       pricePerSeat: req.body.pricePerSeat,
@@ -37,10 +39,25 @@ exports.addRide = catchAsync(async (req, res, next) => {
     });
   }
 });
-
 exports.rides = catchAsync(async (req, res, next) => {
   try {
-    const rides = await Ride.find().populate("driverId");
+    let rides;
+    if (req.body.driverId) {
+      rides = await Ride.find({ driverId: req.body.driverId })
+        .populate("driverId")
+        .populate("companyId")
+        .populate("travelLine");
+    } else if (req.body.companyId) {
+      rides = await Ride.find({ companyId: req.body.companyId })
+        .populate("driverId")
+        .populate("companyId")
+        .populate("travelLine");
+    } else {
+      rides = await Ride.find()
+        .populate("driverId")
+        .populate("companyId")
+        .populate("travelLine");
+    }
 
     res.status(200).json({
       status: "success",
