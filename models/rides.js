@@ -39,6 +39,17 @@ const rideSchema = new mongoose.Schema({
     enum: ["waiting", "accepted", "rejected"],
     default: "waiting",
   },
+
+  rate: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: 0,
+  },
+  ratings: {
+    type: [Number],
+    default: [],
+  },
 });
 // rideSchema.pre("remove", function (next) {
 //   bookSchema.remove({ ride: this._id }).exec();
@@ -46,6 +57,10 @@ const rideSchema = new mongoose.Schema({
 // });
 rideSchema.pre("find", function (next) {
   this.populate("driverId");
+  next();
+});
+rideSchema.pre("find", function (next) {
+  this.populate("travelLine");
   next();
 });
 

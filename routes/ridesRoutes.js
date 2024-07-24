@@ -23,7 +23,9 @@ router.patch(
 
 //
 router.post("/addRide", authController.isLoggedIn, ridesControllers.addRide);
-router.get("/rides", ridesControllers.rides);
+router.post("/rides", ridesControllers.rides);
 router.put("/rides/update/:rideId", ridesControllers.updateRideAndDriverState);
+
+router.post("/rides/rate/:rideId", ridesControllers.rateAride);
 
 module.exports = router;
