@@ -3,78 +3,6 @@ const Book = require("../models/book");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
-exports.addRide = catchAsync(async (req, res, next) => {
-  try {
-    const { _id } = res.locals.currentUser;
-    const companyId = _id.toString();
-    const ride = await Ride.create({
-      depatureDate: req.body.depatureDate,
-      depatureTime: req.body.depatureTime,
-      arrivingTime: req.body.arrivingTime,
-
-      travelLine: req.body.travelLine,
-
-      availableSeats: req.body.seats,
-      seats: req.body.seats,
-      pricePerSeat: req.body.pricePerSeat,
-
-      carColor: req.body.carColor,
-      carType: req.body.carType,
-
-      companyId: companyId,
-
-      driverId: req.body.driverId,
-    });
-
-    res.status(201).json({
-      status: "success",
-      data: {
-        ride,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "error",
-      message: err.message,
-    });
-  }
-});
-exports.rides = catchAsync(async (req, res, next) => {
-  try {
-    let rides;
-    if (req.body.driverId) {
-      rides = await Ride.find({ driverId: req.body.driverId })
-        .populate("driverId")
-        .populate("companyId")
-        .populate("travelLine");
-    } else if (req.body.companyId) {
-      rides = await Ride.find({ companyId: req.body.companyId })
-        .populate("driverId")
-        .populate("companyId")
-        .populate("travelLine");
-    } else {
-      rides = await Ride.find()
-        .populate("driverId")
-        .populate("companyId")
-        .populate("travelLine");
-    }
-
-    res.status(200).json({
-      status: "success",
-      results: rides.length,
-      data: {
-        rides,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: "error",
-      message: error.message,
-    });
-  }
-});
-
 exports.findRides = catchAsync(async (req, res, next) => {
   try {
     const depatureCity = req.body.depatureCity;
@@ -289,3 +217,101 @@ exports.deleteBook = catchAsync(async (req, res, next) => {
     });
   }
 });
+
+//////
+
+exports.addRide = catchAsync(async (req, res, next) => {
+  try {
+    const { _id } = res.locals.currentUser;
+    const companyId = _id.toString();
+    const ride = await Ride.create({
+      depatureDate: req.body.depatureDate,
+      depatureTime: req.body.depatureTime,
+      arrivingTime: req.body.arrivingTime,
+
+      travelLine: req.body.travelLine,
+
+      availableSeats: req.body.seats,
+      seats: req.body.seats,
+      pricePerSeat: req.body.pricePerSeat,
+
+      carColor: req.body.carColor,
+      carType: req.body.carType,
+
+      companyId: companyId,
+
+      driverId: req.body.driverId,
+    });
+
+    res.status(201).json({
+      status: "success",
+      data: {
+        ride,
+      },
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: "error",
+      message: err.message,
+    });
+  }
+});
+
+exports.rides = catchAsync(async (req, res, next) => {
+  try {
+    let rides;
+    if (req.body.driverId) {
+      rides = await Ride.find({ driverId: req.body.driverId })
+        .populate("driverId")
+        .populate("companyId")
+        .populate("travelLine");
+    } else if (req.body.companyId) {
+      rides = await Ride.find({ companyId: req.body.companyId })
+        .populate("driverId")
+        .populate("companyId")
+        .populate("travelLine");
+    } else {
+      rides = await Ride.find()
+        .populate("driverId")
+        .populate("companyId")
+        .populate("travelLine");
+    }
+
+    res.status(200).json({
+      status: "success",
+      results: rides.length,
+      data: {
+        rides,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+});
+
+exports.updateRideAndDriverState = async (req, res) => {
+  try {
+    const { rideId } = req.params;
+    const { rideState, driverState } = req.body;
+
+    const ride = await Ride.findById(rideId);
+
+    if (!ride) {
+      return res.status(404).json({ error: "Ride not found" });
+    }
+
+    if (rideState) ride.rideState = rideState;
+    if (driverState) ride.driverState = driverState;
+
+    await ride.save();
+
+    res.status(200).json({ message: "Ride states updated", ride });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+};
