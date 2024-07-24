@@ -26,6 +26,4 @@ router.post("/addRide", authController.isLoggedIn, ridesControllers.addRide);
 router.post("/rides", ridesControllers.rides);
 router.put("/rides/update/:rideId", ridesControllers.updateRideAndDriverState);
 
-router.post("/rides/rate/:rideId", ridesControllers.rateAride);
-
 module.exports = router;

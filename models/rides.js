@@ -31,24 +31,13 @@ const rideSchema = new mongoose.Schema({
   },
   rideState: {
     type: String,
-    enum: ["ongoing", "arrived"],
-    default: "ongoing",
+    enum: ["ongoing", "arrived", "waiting"],
+    default: "waiting",
   },
   driverState: {
     type: String,
     enum: ["waiting", "accepted", "rejected"],
     default: "waiting",
-  },
-
-  rate: {
-    type: Number,
-    min: 0,
-    max: 5,
-    default: 0,
-  },
-  ratings: {
-    type: [Number],
-    default: [],
   },
 });
 // rideSchema.pre("remove", function (next) {

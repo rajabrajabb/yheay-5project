@@ -30,4 +30,12 @@ router.get(
 
 router.put("/set-driver/:rideId", companyController.setNewDriverToAride);
 
+router.post("/rate/:companyId", companyController.rateAcompany);
+
+router.post("/comment/:companyId", companyController.postComment);
+
+router.get("/companies", companyController.companies);
+
+router.get("/companies/:companyId", companyController.companyProfile);
+
 module.exports = router;

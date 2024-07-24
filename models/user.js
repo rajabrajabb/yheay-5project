@@ -50,6 +50,22 @@ const userSchema = new mongoose.Schema({
     ref: "User",
     default: null,
   },
+  rate: {
+    type: Number,
+    min: 0,
+    max: 5,
+    default: 0,
+  },
+  ratings: {
+    type: [Number],
+    default: [],
+  },
+  comments: [
+    {
+      comment: { type: String, required: true },
+      username: { type: String, required: true },
+    },
+  ],
 });
 
 userSchema.pre("save", async function (next) {

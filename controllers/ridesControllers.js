@@ -221,28 +221,28 @@ exports.addRide = catchAsync(async (req, res, next) => {
 
 exports.rides = catchAsync(async (req, res, next) => {
   try {
-    let findedRides;
+    let rides;
     if (req.body.driverId) {
-      findedRides = await Ride.find({ driverId: req.body.driverId })
+      rides = await Ride.find({ driverId: req.body.driverId })
         .populate("driverId")
         .populate("companyId")
         .populate("travelLine");
     } else if (req.body.companyId) {
-      findedRides = await Ride.find({ companyId: req.body.companyId })
+      rides = await Ride.find({ companyId: req.body.companyId })
         .populate("driverId")
         .populate("companyId")
         .populate("travelLine");
     } else {
-      findedRides = await Ride.find()
+      rides = await Ride.find()
         .populate("driverId")
         .populate("companyId")
         .populate("travelLine");
     }
 
-    const rides = findedRides.map((ride) => {
-      const { ratings, ...rideWithoutRatings } = ride.toObject();
-      return rideWithoutRatings;
-    });
+    // const rides = findedRides.map((ride) => {
+    //   const { ratings, ...rideWithoutRatings } = ride.toObject();
+    //   return rideWithoutRatings;
+    // });
 
     res.status(200).json({
       status: "success",
@@ -324,40 +324,13 @@ exports.updateRideAndDriverState = async (req, res) => {
     if (rideState) ride.rideState = rideState;
     if (driverState) ride.driverState = driverState;
 
+    if (driverState == "accepted") ride.rideState = "ongoing";
+
     await ride.save();
 
     res.status(200).json({ message: "Ride states updated", ride });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
-  }
-};
-
-exports.rateAride = async (req, res) => {
-  try {
-    const { rideId } = req.params;
-    const { rating } = req.body;
-
-    const ride = await Ride.findById(rideId);
-
-    console.log(ride);
-
-    if (!ride) {
-      return res.status(404).json({ error: "Ride not found" });
-    }
-
-    ride.ratings.push(rating);
-    ride.rate =
-      ride.ratings.reduce((acc, curr) => acc + curr, 0) / ride.ratings.length;
-
-    await ride.save();
-
-    res.status(200).json({ message: "Ride rating updated", ride });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      status: "error",
-      message: error.message,
-    });
   }
 };
