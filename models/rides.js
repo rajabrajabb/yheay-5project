@@ -13,24 +13,18 @@ const rideSchema = new mongoose.Schema({
     required: true,
     enum: ["truck", "car", "bus"],
   },
-  driverId: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-    },
-  ],
-  companyId: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "User",
-    },
-  ],
-  travelLine: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "TravelLine",
-    },
-  ],
+  driverId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
+  companyId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "User",
+  },
+  travelLine: {
+    type: mongoose.Schema.ObjectId,
+    ref: "TravelLine",
+  },
   createdAt: {
     type: Date,
     default: Date.now,

@@ -28,4 +28,6 @@ router.get(
   companyController.getEmployeesByCompanyId
 );
 
+router.put("/set-driver/:rideId", companyController.setNewDriverToAride);
+
 module.exports = router;

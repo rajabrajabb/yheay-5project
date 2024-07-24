@@ -31,6 +31,7 @@ const createSendToken = (user, statusCode, res) => {
     status: "success",
     token,
     role: user.role,
+    _id: user._id,
   });
 };
 

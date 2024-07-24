@@ -1,5 +1,8 @@
 const TravelLine = require("../models/travelLine");
 const User = require("../models/user");
+const Ride = require("../models/rides");
+
+const mongoose = require("mongoose");
 
 exports.createTravelLine = async (req, res) => {
   try {
@@ -86,5 +89,28 @@ exports.getEmployeesByCompanyId = async (req, res) => {
     res.json(employees);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.setNewDriverToAride = async (req, res) => {
+  try {
+    const { rideId } = req.params;
+    const { driverId } = req.body;
+
+    const ride = await Ride.findById(rideId);
+
+    if (ride.driverState == "accepted" || ride.driverState == "waiting") {
+      return res.status(400).json({ error: "Ride already has a driver" });
+    }
+
+    ride.driverId = driverId;
+    ride.driverState = "waiting";
+
+    await ride.save();
+
+    res.status(200).json({ message: "Ride driver updated", ride });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
 };
