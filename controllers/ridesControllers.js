@@ -3,6 +3,9 @@ const Book = require("../models/book");
 const TravelLine = require("../models/travelLine");
 const AppError = require("../utils/appError");
 const catchAsync = require("../utils/catchAsync");
+const uuidv4 = require("uuid").v4;
+const path = require("path");
+const fs = require("fs");
 
 exports.get3 = catchAsync(async (req, res, next) => {
   try {
@@ -25,7 +28,9 @@ exports.get3 = catchAsync(async (req, res, next) => {
 exports.oneRide = catchAsync(async (req, res, next) => {
   try {
     const rideId = req.params.rideId;
-    const ride = await Ride.findById(rideId).populate("driverId");
+    const ride = await Ride.findById(rideId)
+      .populate("driverId")
+      .populate("travelLine");
 
     res.status(200).json({
       status: "success",
@@ -194,6 +199,32 @@ exports.addRide = catchAsync(async (req, res, next) => {
   try {
     const { _id } = res.locals.currentUser;
     const companyId = _id.toString();
+
+    const matches = req.body.carImage.match(
+      /^data:([A-Za-z-+\/]+);base64,(.+)$/
+    );
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+
+    let ext;
+    if (mimeType === "image/png") {
+      ext = ".png";
+    } else if (mimeType === "image/jpeg") {
+      ext = ".jpg";
+    } else {
+      console.error(`Unsupported file type: ${mimeType}`);
+      return;
+    }
+    const fileName = `${uuidv4()}${ext}`;
+    const filePath = path.join(__dirname, "../public", "images", fileName);
+    fs.writeFile(filePath, base64Data, "base64", (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+    });
+    const fileUrl = `/images/${fileName}`;
+
     const ride = await Ride.create({
       depatureDate: req.body.depatureDate,
       depatureTime: req.body.depatureTime,
@@ -207,6 +238,7 @@ exports.addRide = catchAsync(async (req, res, next) => {
 
       carColor: req.body.carColor,
       carType: req.body.carType,
+      carImage: fileUrl,
 
       companyId: companyId,
 

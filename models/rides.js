@@ -13,6 +13,7 @@ const rideSchema = new mongoose.Schema({
     required: true,
     enum: ["truck", "car", "bus"],
   },
+  carImage: String,
   driverId: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
