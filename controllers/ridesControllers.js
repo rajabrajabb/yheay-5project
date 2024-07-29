@@ -44,10 +44,12 @@ exports.oneRide = catchAsync(async (req, res, next) => {
 
 exports.book = catchAsync(async (req, res, next) => {
   try {
-    const { numOfSeatsBooked } = req.body;
+    const { numOfSeatsBooked, identityNumber } = req.body;
     const rideId = req.params.rideId;
     const { _id } = res.locals.currentUser;
     const passengerId = _id.toString();
+
+    let totalPrice;
 
     const ride = await Ride.findById(rideId);
     if (!ride) {
@@ -56,12 +58,18 @@ exports.book = catchAsync(async (req, res, next) => {
         message: "Ride not found",
       });
     }
-    const totalPrice = parseInt(numOfSeatsBooked) * parseInt(ride.pricePerSeat);
+
+    if (ride.carType == "car") {
+      totalPrice = ride.pricePerSeat;
+    } else {
+      totalPrice = parseInt(numOfSeatsBooked) * parseInt(ride.pricePerSeat);
+    }
     const book = await new Book({
       numOfSeatsBooked,
       totalPrice: totalPrice,
       passenger: passengerId,
       ride: rideId,
+      identityNumber: identityNumber,
     });
 
     book.populate("ride").then(() => {
