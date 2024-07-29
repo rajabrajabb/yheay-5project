@@ -295,13 +295,6 @@ exports.findRides = catchAsync(async (req, res, next) => {
 
     const rides = await Ride.find(rideQuery);
 
-    if (rides.length === 0) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Rides not found",
-      });
-    }
-
     res.status(200).json({
       status: "success",
       results: rides.length,
